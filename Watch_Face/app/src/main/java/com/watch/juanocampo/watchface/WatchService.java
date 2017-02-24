@@ -126,6 +126,7 @@ public class WatchService extends CanvasWatchFaceService {
         private boolean mAmbient;
         private boolean mLowBitAmbient;
         private boolean mBurnInProtection;
+        private Bitmap mBackgroundAmbientMode;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -141,6 +142,9 @@ public class WatchService extends CanvasWatchFaceService {
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(Color.BLACK);
             mBackgroundBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.bg);
+
+            mBackgroundAmbientMode = BitmapFactory.decodeResource(getResources(), R.drawable.bg);
+
 
             /* Set defaults for colors */
             mWatchHandColor = Color.WHITE;
@@ -320,11 +324,10 @@ public class WatchService extends CanvasWatchFaceService {
                     Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(mGrayBackgroundBitmap);
             Paint grayPaint = new Paint();
-            ColorMatrix colorMatrix = new ColorMatrix();
-            colorMatrix.setSaturation(0);
-            ColorMatrixColorFilter filter = new ColorMatrixColorFilter(colorMatrix);
-            grayPaint.setColorFilter(filter);
-            canvas.drawBitmap(mBackgroundBitmap, 0, 0, grayPaint);
+            grayPaint.setColor(0);
+            grayPaint.setStyle(Paint.Style.FILL);
+            grayPaint.setARGB(0,0,0,0);
+            canvas.drawBitmap(mGrayBackgroundBitmap, 0, 0, grayPaint);
         }
 
         /**
@@ -358,7 +361,7 @@ public class WatchService extends CanvasWatchFaceService {
             if (mAmbient && (mLowBitAmbient || mBurnInProtection)) {
                 canvas.drawColor(Color.BLACK);
             } else if (mAmbient) {
-                canvas.drawBitmap(mGrayBackgroundBitmap, 0, 0, mBackgroundPaint);
+                canvas.drawColor(Color.BLACK);
             } else {
                 canvas.drawBitmap(mBackgroundBitmap, 0, 0, mBackgroundPaint);
             }
@@ -436,11 +439,6 @@ public class WatchService extends CanvasWatchFaceService {
 
             /* Restore the canvas' original orientation. */
             canvas.restore();
-
-            /* Draw rectangle behind peek card in ambient mode to improve readability. */
-            if (mAmbient) {
-                canvas.drawRect(mPeekCardBounds, mBackgroundPaint);
-            }
         }
 
         @Override
